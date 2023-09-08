@@ -317,9 +317,9 @@ public class IdentityController {
 
 	// search beneficiary by lastModDate and districtID
 	@CrossOrigin(origins = { "*commonapi*" })
-	@ApiOperation(value ="Search beneficiary by blockId and last modified date")
-	@PostMapping(path = "/searchByDistrictId")
-	public @ResponseBody String searchBeneficiaryByBlockIdAndLastModDate(
+	@ApiOperation(value ="Search beneficiary by villageId and last modified date-time")
+	@PostMapping(path = "/searchByVillageIdAndLastModifiedDate")
+	public @ResponseBody String searchBeneficiaryByVillageIdAndLastModDate(
 			@ApiParam(value = "\"String\"") @RequestBody String object) {
 		logger.info("IdentityController.getBeneficiary - start. search object = " + object);
 		String response;
@@ -328,14 +328,14 @@ public class IdentityController {
 			JsonElement json = new JsonParser().parse(object);
 
 			SearchSyncDTO search = InputMapper.getInstance().gson().fromJson(json, SearchSyncDTO.class);
-			List<BeneficiariesDTO> list = svc.searchBeneficiaryByBlockIdAndLastModifyDate(search.getBlockID(), new Timestamp(search.getLastModifDate()));
+			List<BeneficiariesDTO> list = svc.searchBeneficiaryByVillageIdAndLastModifyDate(search.getVillageID(), new Timestamp(search.getLastModifiedDate()));
 
-			response = getSuccessResponseString(list, 200, "success", "getIdentityByAgent");
+			response = getSuccessResponseString(list, 200, "success", "getIdentityByVillageAndLastSyncTime");
 
 			logger.info("IdentityController.getBeneficiary - end");
 		} catch (Exception e) {
 			logger.error("error in beneficiary search by Family Id : " + e.getLocalizedMessage());
-			response = getErrorResponseString("error in beneficiary search by block Id  : " + e.getLocalizedMessage(),
+			response = getErrorResponseString("error in beneficiary search by village Id and last sync date  : " + e.getLocalizedMessage(),
 					5000, "failure", "");
 		}
 		return response;
