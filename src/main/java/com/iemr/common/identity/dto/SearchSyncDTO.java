@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 public class SearchSyncDTO {
 
-	private Long lastModifDate;
-	private Integer blockID;
+	private Long lastModifiedDate;
+	private Integer villageID;
 
 }

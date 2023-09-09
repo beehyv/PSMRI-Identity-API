@@ -126,10 +126,9 @@ public interface BenMappingRepo extends CrudRepository<MBeneficiarymapping, BigI
 	public List<Object[]> getBenMappingByVanSerialNo(@Param("benMapIds") BigInteger benMapIds,
 			@Param("vanID") Integer vanID);
 
-	@Query(value = "select m from MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId = :blockID and (m.mBeneficiaryAccount.lastModDate > :lastModDate "
-			+ "or m.mBeneficiaryaddress.lastModDate > :lastModDate or m.mBeneficiaryconsent.lastModDate > :lastModDate "
-			+ "or m.mBeneficiarycontact.lastModDate > :lastModDate or m.mBeneficiarydetail.lastModDate > :lastModDate ) "
-			+ "order by m.benMapId Desc")
-	List<MBeneficiarymapping> findByBeneficiaryDetailsByBlockIDAndLastModifyDate(@Param("blockID") int blockID, @Param("lastModDate") Timestamp lastModDate);
+	@Query(value = "select m from MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId = :villageID and "
+			+ "(m.mBeneficiaryaddress.lastModDate > :lastModDate or m.mBeneficiarycontact.lastModDate > :lastModDate "
+			+ "or m.mBeneficiarydetail.lastModDate > :lastModDate ) order by m.benMapId Desc")
+	List<MBeneficiarymapping> findByBeneficiaryDetailsByVillageIDAndLastModifyDate(@Param("villageID") int villageID, @Param("lastModDate") Timestamp lastModifiedDate);
 
 }
