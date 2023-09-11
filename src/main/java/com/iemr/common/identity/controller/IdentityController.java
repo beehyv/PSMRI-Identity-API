@@ -334,8 +334,8 @@ public class IdentityController {
 
 			logger.info("IdentityController.getBeneficiary - end");
 		} catch (Exception e) {
-			logger.error("error in beneficiary search by Family Id : " + e.getLocalizedMessage());
-			response = getErrorResponseString("error in beneficiary search by village Id and last sync date  : " + e.getLocalizedMessage(),
+			logger.error("error in beneficiary search by village Ids and last sync date : " + e.getLocalizedMessage());
+			response = getErrorResponseString("error in beneficiary search by village Ids and last sync date  : " + e.getLocalizedMessage(),
 					5000, "failure", "");
 		}
 		return response;
