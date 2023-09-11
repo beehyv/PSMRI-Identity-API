@@ -126,9 +126,9 @@ public interface BenMappingRepo extends CrudRepository<MBeneficiarymapping, BigI
 	public List<Object[]> getBenMappingByVanSerialNo(@Param("benMapIds") BigInteger benMapIds,
 			@Param("vanID") Integer vanID);
 
-	@Query(value = "select m from MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId = :villageID and "
+	@Query(value = "select m from MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId IN :villageIDs and "
 			+ "(m.mBeneficiaryaddress.lastModDate > :lastModDate or m.mBeneficiarycontact.lastModDate > :lastModDate "
 			+ "or m.mBeneficiarydetail.lastModDate > :lastModDate ) order by m.benMapId Desc")
-	List<MBeneficiarymapping> findByBeneficiaryDetailsByVillageIDAndLastModifyDate(@Param("villageID") int villageID, @Param("lastModDate") Timestamp lastModifiedDate);
+	List<MBeneficiarymapping> findByBeneficiaryDetailsByVillageIDAndLastModifyDate(@Param("villageIDs") List<Integer> villageID, @Param("lastModDate") Timestamp lastModifiedDate);
 
 }
