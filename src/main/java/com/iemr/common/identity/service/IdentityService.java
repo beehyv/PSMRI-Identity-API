@@ -507,12 +507,12 @@ public class IdentityService {
 		return beneficiaryList;
 	}
 
-	public List<BeneficiariesDTO> searchBeneficiaryByVillageIdAndLastModifyDate(Integer villageID, Timestamp lastModifiedDate) {
+	public List<BeneficiariesDTO> searchBeneficiaryByVillageIdAndLastModifyDate(List<Integer> villageIDs, Timestamp lastModifiedDate) {
 
 		List<BeneficiariesDTO> beneficiaryList = new ArrayList<BeneficiariesDTO>();
 		try {
 			// find benmap ids
-			List<MBeneficiarymapping> benMappingsList = mappingRepo.findByBeneficiaryDetailsByVillageIDAndLastModifyDate(villageID, lastModifiedDate);
+			List<MBeneficiarymapping> benMappingsList = mappingRepo.findByBeneficiaryDetailsByVillageIDAndLastModifyDate(villageIDs, lastModifiedDate);
 			if (benMappingsList != null && !benMappingsList.isEmpty()){
 
 				for (MBeneficiarymapping benMapOBJ : benMappingsList) {
@@ -521,7 +521,7 @@ public class IdentityService {
 			}
 		} catch (Exception e) {
 			logger.error(
-					"error in beneficiary search to sync to CHO App with villageID: " + villageID + " error : " + e.getLocalizedMessage());
+					"error in beneficiary search to sync to CHO App with villageIDs: " + villageIDs + " error : " + e.getLocalizedMessage());
 		}
 		return beneficiaryList;
 	}
