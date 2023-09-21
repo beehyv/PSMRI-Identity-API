@@ -40,6 +40,10 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -507,23 +511,31 @@ public class IdentityService {
 		return beneficiaryList;
 	}
 
-	public List<BeneficiariesDTO> searchBeneficiaryByVillageIdAndLastModifyDate(List<Integer> villageIDs, Timestamp lastModifiedDate) {
+	public Page<BeneficiariesDTO> searchBeneficiaryByVillageIdAndLastModifyDate(List<Integer> villageIDs, Timestamp lastModifiedDate, Integer pageNo , Integer pageSize) {
 
+		Pageable pageable;
+		Page<MBeneficiarymapping> beneficiarymappingPage;
 		List<BeneficiariesDTO> beneficiaryList = new ArrayList<BeneficiariesDTO>();
+		Page<BeneficiariesDTO> beneficiariesDTOPage = null;
+		pageable = new PageRequest(pageNo,pageSize);
 		try {
 			// find benmap ids
-			List<MBeneficiarymapping> benMappingsList = mappingRepo.findByBeneficiaryDetailsByVillageIDAndLastModifyDate(villageIDs, lastModifiedDate);
-			if (benMappingsList != null && !benMappingsList.isEmpty()){
+			beneficiarymappingPage = mappingRepo.findBeneficiaryByVillageIDAndLastModifiedDatePaginated(villageIDs, lastModifiedDate,pageable);
 
-				for (MBeneficiarymapping benMapOBJ : benMappingsList) {
+			long totalElements = beneficiarymappingPage.getTotalElements();
+
+			if (!beneficiarymappingPage.getContent().isEmpty()){
+
+				for (MBeneficiarymapping benMapOBJ : beneficiarymappingPage.getContent()) {
 					beneficiaryList.add(this.getBeneficiariesDTO(benMapOBJ));
 				}
 			}
+			beneficiariesDTOPage  = new PageImpl<>(beneficiaryList,pageable,totalElements);
 		} catch (Exception e) {
 			logger.error(
 					"error in beneficiary search to sync to CHO App with villageIDs: " + villageIDs + " error : " + e.getLocalizedMessage());
 		}
-		return beneficiaryList;
+		return beneficiariesDTOPage;
 	}
 
 	public List<BeneficiariesDTO> searhBeneficiaryByGovIdentity(String identity)

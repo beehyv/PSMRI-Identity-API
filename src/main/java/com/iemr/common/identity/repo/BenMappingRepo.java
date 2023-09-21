@@ -25,6 +25,8 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -126,9 +128,9 @@ public interface BenMappingRepo extends CrudRepository<MBeneficiarymapping, BigI
 	public List<Object[]> getBenMappingByVanSerialNo(@Param("benMapIds") BigInteger benMapIds,
 			@Param("vanID") Integer vanID);
 
-	@Query(value = "select m from MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId IN :villageIDs and "
-			+ "(m.mBeneficiaryaddress.lastModDate > :lastModDate or m.mBeneficiarycontact.lastModDate > :lastModDate "
-			+ "or m.mBeneficiarydetail.lastModDate > :lastModDate ) order by m.benMapId Desc")
-	List<MBeneficiarymapping> findByBeneficiaryDetailsByVillageIDAndLastModifyDate(@Param("villageIDs") List<Integer> villageID, @Param("lastModDate") Timestamp lastModifiedDate);
-
+	@Query("SELECT m FROM MBeneficiarymapping m where m.mBeneficiaryaddress.permVillageId IN :villageIDs AND" +
+			" GREATEST(m.mBeneficiaryaddress.lastModDate, m.mBeneficiarycontact.lastModDate, m.mBeneficiarydetail.lastModDate) > :lastModDate " +
+			"ORDER BY GREATEST(m.mBeneficiaryaddress.lastModDate, m.mBeneficiarycontact.lastModDate, m.mBeneficiarydetail.lastModDate) ASC ")
+	Page<MBeneficiarymapping> findBeneficiaryByVillageIDAndLastModifiedDatePaginated(@Param("villageIDs") List<Integer> villageID,
+																					 @Param("lastModDate") Timestamp lastModifiedDate, Pageable pageable);
 }

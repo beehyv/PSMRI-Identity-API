@@ -24,6 +24,7 @@ package com.iemr.common.identity.controller;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,10 +33,12 @@ import java.util.Objects;
 import javax.persistence.NoResultException;
 import javax.persistence.QueryTimeoutException;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iemr.common.identity.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -328,9 +331,9 @@ public class IdentityController {
 			JsonElement json = new JsonParser().parse(object);
 
 			SearchSyncDTO search = InputMapper.getInstance().gson().fromJson(json, SearchSyncDTO.class);
-			List<BeneficiariesDTO> list = svc.searchBeneficiaryByVillageIdAndLastModifyDate(search.getVillageID(), new Timestamp(search.getLastModifiedDate()));
+			Page<BeneficiariesDTO> beneficiariesDTOPage = svc.searchBeneficiaryByVillageIdAndLastModifyDate(search.getVillageID(), new Timestamp(search.getLastModifiedDate()), search.getPageNo(), search.getPageSize());
 
-			response = getSuccessResponseString(list, 200, "success", "getIdentityByVillageAndLastSyncTime");
+			response = getSuccessPaginatedResponseString(beneficiariesDTOPage, 200, "success", "getIdentityByVillageAndLastSyncTime");
 
 			logger.info("IdentityController.getBeneficiary - end");
 		} catch (Exception e) {
@@ -794,6 +797,21 @@ public class IdentityController {
 		}.getType();
 		String data = OutputMapper.getInstance().gson().toJson(list, typeOfSrc);
 		logger.info("data response size:" + (list != null ? list.size() : "No Beneficiary Found"));
+		OutputResponse response = new OutputResponse.Builder().setDataJsonType("JsonObject.class")
+				.setStatusCode(statusCode).setStatusMessage(statusMsg)
+				.setDataObjectType(this.getClass().getSimpleName()).setMethodName(methodName).setData(data).build();
+		return response.toString();
+	}
+
+	private String getSuccessPaginatedResponseString(Page<BeneficiariesDTO> beneficiariesDTOS, Integer statusCode, String statusMsg,
+											String methodName) throws JsonProcessingException {
+		ObjectMapper obj = new ObjectMapper();
+		obj.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		obj.setDateFormat(dateFormat);
+
+		String data = obj.writeValueAsString(beneficiariesDTOS);
+		logger.info("Total results data response size:" + (!beneficiariesDTOS.getContent().isEmpty() ? beneficiariesDTOS.getTotalElements() : "No Beneficiary Found"));
 		OutputResponse response = new OutputResponse.Builder().setDataJsonType("JsonObject.class")
 				.setStatusCode(statusCode).setStatusMessage(statusMsg)
 				.setDataObjectType(this.getClass().getSimpleName()).setMethodName(methodName).setData(data).build();
