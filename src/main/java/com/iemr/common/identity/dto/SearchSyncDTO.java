@@ -29,5 +29,7 @@ public class SearchSyncDTO {
 
 	private Long lastModifiedDate;
 	private List<Integer> villageID;
+	private Integer pageNo;
+	private Integer pageSize;
 
 }
