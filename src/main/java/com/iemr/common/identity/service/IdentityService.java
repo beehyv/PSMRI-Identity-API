@@ -526,6 +526,20 @@ public class IdentityService {
 		return beneficiaryList;
 	}
 
+	public Long countBeneficiaryByVillageIdAndLastModifyDate(List<Integer> villageIDs, Timestamp lastModifiedDate) {
+
+		Long beneficiaryCount= 0L;
+		try {
+			// find benmap ids
+			beneficiaryCount = mappingRepo.getBeneficiaryCountsByVillageIDAndLastModifyDate(villageIDs, lastModifiedDate);
+
+		} catch (Exception e) {
+			logger.error(
+					"error in getting beneficiary count to sync to CHO App with villageIDs: " + villageIDs + " error : " + e.getLocalizedMessage());
+		}
+		return beneficiaryCount;
+	}
+
 	public List<BeneficiariesDTO> searhBeneficiaryByGovIdentity(String identity)
 			throws NoResultException, QueryTimeoutException, Exception {
 		List<BeneficiariesDTO> beneficiaryList = new ArrayList<BeneficiariesDTO>();
